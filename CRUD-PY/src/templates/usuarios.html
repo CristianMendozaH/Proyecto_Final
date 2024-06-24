@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Incluir estilos de flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Incluir script de flatpickr -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <style>
+        body {
+            background-image: url('../static/img/blur-hospital.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Arial Bold', sans-serif;
+            color: white;
+        }
+
+        .sidebar {
+            background-color: #1464c4;
+            /* Fondo azul */
+            color: white;
+            /* Texto en blanco */
+            height: 100vh;
+            /* Ocupa toda la altura de la ventana */
+            width: 280px;
+            /* Ancho del sidebar */
+            margin-right: 20px;
+            /* Margen derecho para separarlo del contenido principal */
+            padding: 20px;
+            /* Espaciado interno */
+            position: fixed;
+            /* Fijar posición para que sea siempre visible */
+            top: 0;
+            /* Fijar en la parte superior */
+            left: 0;
+            /* Fijar a la izquierda */
+            z-index: 1;
+            /* Asegurar que esté por encima del contenido principal */
+            overflow-y: auto;
+            /* Agregar scroll si el contenido es largo */
+        }
+
+        .main-content {
+            margin-left: 300px; /* Ajuste para dejar espacio para el sidebar */
+            padding: 20px;
+            color: black; /* Color de texto negro para el contenido principal */
+        }
+
+        .main-content h1 {
+            color: black; /* Color de texto negro para el h1 */
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        .edit-btn, .delete-btn {
+            margin-right: 10px;
+        }
+        .edit-btn:hover, .delete-btn:hover {
+            background-color: #45a049;
+        }
+        .add-btn {
+            margin-bottom: 20px;
+        }
+        .add-btn:hover {
+            background-color: #357a38;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            -webkit-animation-name: animatetop;
+            -webkit-animation-duration: 0.4s;
+            animation-name: animatetop;
+            animation-duration: 0.4s;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        @-webkit-keyframes animatetop {
+            from {top: -300px; opacity: 0}
+            to {top: 0; opacity: 1}
+        }
+        @keyframes animatetop {
+            from {top: -300px; opacity: 0}
+            to {top: 0; opacity: 1}
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="/menu" class="d-flex align-items-center mb-2 mb-md-0 me-md-auto text-white text-decoration-none">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" width="180" height="70" alt="Logotipo">
+        </a>
+        <hr>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li><a href="/doctores" class="nav-link text-white">Doctores (3)</a></li>
+            <li><a href="/farmacia" class="nav-link text-white">Farmacia (5)</a></li>
+            <li><a href="/enfermeras" class="nav-link text-white">Enfermeras (4)</a></li>
+            <li><a href="/ventas" class="nav-link text-white">Ventas</a></li>
+            <li><a href="/usuarios" class="nav-link text-white">Usuarios</a></li>
+            <li><a href="/mantenimiento" class="nav-link text-white">Mantenimiento</a></li>
+            <li><a href="/reportes" class="nav-link text-white">Reportes</a></li>
+            <hr>
+            <li><a href="/" class="nav-link text-white">Salir</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+    <h1>Usuarios</h1>
+
+    <button class="btn btn-primary" onclick="openModal('add-modal')">Agregar Usuario</button>
+
+    <table class="table table-striped">
+        <tr>
+            <th>ID</th>
+            <th>Rol</th>
+            <th>Puesto</th>
+            <th>DPI</th>
+            <th>Nombres</th>
+            <th>Apellidos</th>
+            <th>Teléfono</th>
+            <th>Dirección</th>
+            <th>Usuario</th>
+            <th>Clave</th>
+            <th>Acciones</th>
+        </tr>
+        {% for user in usuarios %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.rol }}</td>
+            <td>{{ user.puesto }}</td>
+            <td>{{ user.dpi }}</td>
+            <td>{{ user.nombres }}</td>
+            <td>{{ user.apellidos }}</td>
+            <td>{{ user.telefono }}</td>
+            <td>{{ user.direccion }}</td>
+            <td>{{ user.usuario }}</td>
+            <td>{{ user.clave }}</td>
+            <td>
+                <span class="btn btn-danger" onclick="openModal('edit-modal-{{ user.id }}')">Editar</span>
+                <span class="btn btn-warning" onclick="confirmDelete('{{ user.id }}')">Eliminar</span>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <!-- Modal para agregar usuario -->
+    <div id="add-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('add-modal')">&times;</span>
+            <h2>Agregar Usuario</h2>
+            <form method="POST" action="/usuarios/agregar">
+                <label for="txtRol">Rol:</label>
+                <input class="form-control" type="text" id="txtRol" name="txtRol" required><br>
+                <label for="txtPuesto">Puesto:</label>
+                <input class="form-control" type="text" id="txtPuesto" name="txtPuesto" required><br>
+                <label for="txtDpi">DPI:</label>
+                <input class="form-control" type="text" id="txtDpi" name="txtDpi" required><br>
+                <label for="txtNombres">Nombres:</label>
+                <input class="form-control" type="text" id="txtNombres" name="txtNombres" required><br>
+                <label for="txtApellidos">Apellidos:</label>
+                <input class="form-control" type="text" id="txtApellidos" name="txtApellidos" required><br>
+                <label for="txtTelefono">Teléfono:</label>
+                <input class="form-control" type="text" id="txtTelefono" name="txtTelefono" required><br>
+                <label for="txtDireccion">Dirección:</label>
+                <input class="form-control" type="text" id="txtDireccion" name="txtDireccion" required><br>
+                <label for="txtUsuario">Usuario:</label>
+                <input class="form-control" type="text" id="txtUsuario" name="txtUsuario" required><br>
+                <label for="txtClave">Clave:</label>
+                <input class="form-control" type="password" id="txtClave" name="txtClave" required><br>
+                <input class="btn btn-primary" type="submit" value="Guardar">
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para editar usuario -->
+    {% for user in usuarios %}
+    <div id="edit-modal-{{ user.id }}" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('edit-modal-{{ user.id }}')">&times;</span>
+            <h2>Editar Usuario</h2>
+            <form method="POST" action="/usuarios/editar_guardar/{{ user.id }}">
+                <label for="txtRol">Rol:</label>
+                <input class="form-control" type="text" id="txtRol" name="txtRol" value="{{ user.rol }}" required><br>
+                <label for="txtPuesto">Puesto:</label>
+                <input class="form-control" type="text" id="txtPuesto" name="txtPuesto" value="{{ user.puesto }}" required><br>
+                <label for="txtDpi">DPI:</label>
+                <input class="form-control" type="text" id="txtDpi" name="txtDpi" value="{{ user.dpi }}" required><br>
+                <label for="txtNombres">Nombres:</label>
+                <input class="form-control" type="text" id="txtNombres" name="txtNombres" value="{{ user.nombres }}" required><br>
+                <label for="txtApellidos">Apellidos:</label>
+                <input class="form-control" type="text" id="txtApellidos" name="txtApellidos" value="{{ user.apellidos }}" required><br>
+                <label for="txtTelefono">Teléfono:</label>
+                <input class="form-control" type="text" id="txtTelefono" name="txtTelefono" value="{{ user.telefono }}" required><br>
+                <label for="txtDireccion">Dirección:</label>
+                <input class="form-control" type="text" id="txtDireccion" name="txtDireccion" value="{{ user.direccion }}" required><br>
+                <label for="txtUsuario">Usuario:</label>
+                <input class="form-control" type="text" id="txtUsuario" name="txtUsuario" value="{{ user.usuario }}" required><br>
+                <label for="txtClave">Clave:</label>
+                <input class="form-control" type="password" id="txtClave" name="txtClave" required><br>
+                <input class="btn btn-primary" type="submit" value="Guardar">
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+    <script>
+        // Función para abrir un modal
+        function openModal(modalId) {
+            var modal = document.getElementById(modalId);
+            modal.style.display = "block";
+        }
+
+        // Función para cerrar un modal
+        function closeModal(modalId) {
+            var modal = document.getElementById(modalId);
+            modal.style.display = "none";
+        }
+
+        // Cerrar modal haciendo clic fuera de él
+        window.onclick = function(event) {
+            var modals = document.getElementsByClassName('modal');
+            for (var i = 0; i < modals.length; i++) {
+                var modal = modals[i];
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        }
+
+        // Función para confirmar eliminación
+        function confirmDelete(userId) {
+            if (confirm("¿Está seguro de eliminar este usuario?")) {
+                window.location.href = "/usuarios/eliminar/" + userId;
+            }
+        }
+    </script>
+</body>
+</html>
